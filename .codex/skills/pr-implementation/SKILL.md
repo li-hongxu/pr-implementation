@@ -48,8 +48,11 @@ Create a concise requirement-to-delivery map before coding:
 | ... | ... | ... |
 
 Include anticipated files/tests, the highest-risk behavior, special acceptance
-checks, and applicable review lessons. Keep it in the working conversation unless a
-repository convention requires a planning artifact.
+checks, and applicable review lessons. For every relevant lesson, record its ID,
+the invariant it guards, and concrete verification evidence in this map. Add a
+regression test when the changed code can exercise the lesson's scenario; otherwise
+state why the scenario is not reachable. Keep it in the working conversation unless
+a repository convention requires a planning artifact.
 
 Implement only the scoped change. Reuse established abstractions and public
 contracts; preserve backward compatibility unless the PR explicitly permits a
