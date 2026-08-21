@@ -7,6 +7,32 @@ acceptance criteria，推进到**可验证、已独立审查、可交付**的本
 测试、验收和已有的 `$code-review` 串成同一条交付链路，避免“测试绿了，但 PR 仍然
 无法合并”的情况。
 
+## 流程对比
+
+```mermaid
+flowchart TB
+    subgraph 普通流程
+        A[PR requirements] --> B[编码]
+        B --> C[测试通过]
+        C --> D[交付]
+    end
+
+    subgraph pr-implementation
+        E[PR requirements<br/>+ acceptance criteria] --> F[需求清单与仓库探索]
+        F --> G[实施计划]
+        G --> H[编码与定向测试]
+        H --> I[逐条验收]
+        I --> J[独立 $code-review]
+        J --> K{有需要修复的 finding?}
+        K -- 是 --> L[修复与重新验证]
+        L --> J
+        K -- 否 --> M[最终交付门禁]
+    end
+
+    style D fill:#f6f8fa,stroke:#8c959f,color:#24292f
+    style M fill:#dafbe1,stroke:#1a7f37,color:#1a7f37
+```
+
 ## 它解决什么问题
 
 普通开发流程很容易出现这些断点：
