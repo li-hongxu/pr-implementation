@@ -27,6 +27,22 @@ Proceed when the supplied context is sufficient. Ask only for a material missing
 decision, such as a requirement whose plausible interpretations would produce
 incompatible behavior. Keep the checklist current as facts emerge.
 
+### Semantic-boundary checklist
+
+Before implementation, identify every boundary where one layer claims to trust
+another: committed publication, authorization, identity, version/revision,
+privacy classification, or persisted effect. Record the *proof* accepted at
+that boundary, not merely the fields that name it. A non-empty ID, a frozen
+dataclass, canonical JSON, or a private constructor alone is not proof that an
+external transaction committed.
+
+For each boundary, plan at least one adversarial test that changes exactly one
+claimed fact, such as a forged publication ID, mismatched digest, rebinding of
+two otherwise valid documents, or cross-user object ID. A boundary backed by
+another service needs either a validated witness produced by its adapter or an
+explicit integration test against that adapter. Do not represent metadata as a
+trusted witness without a verification path.
+
 ## 2. Discover the Repository
 
 Read the applicable instructions, relevant implementation and tests, existing
@@ -54,6 +70,18 @@ regression test when the changed code can exercise the lesson's scenario; otherw
 state why the scenario is not reachable. Keep it in the working conversation unless
 a repository convention requires a planning artifact.
 
+When a contract has numbered scenarios or a state machine, add a compact
+requirement-to-test matrix. Each scenario must name its fixture, expected
+effect/no-effect, and assertion. A broad test with many assertions is not
+evidence that every scenario was covered unless the matrix identifies the
+specific assertion for each one.
+
+For comparisons and aggregation, include cross-dimensional fixtures instead of
+only happy-path values. Vary independent revisions separately, and use at least
+two heterogeneous sources for every aggregate field. Set-like aggregate fields
+must be checked for their documented operation, their cardinality limit, and
+preservation of every permitted source value.
+
 Implement only the scoped change. Reuse established abstractions and public
 contracts; preserve backward compatibility unless the PR explicitly permits a
 breaking change. Do not conceal design violations just to satisfy tests, broaden the
@@ -70,6 +98,12 @@ Independently assess every requirement and acceptance criterion as `VERIFIED`,
 `PARTIALLY VERIFIED`, or `NOT VERIFIED`, with the evidence used. Passing tests alone
 do not prove the PR correct. A critical `NOT VERIFIED`, failed required check, or
 unresolved correctness risk blocks completion.
+
+Treat a fixture as suspect when two independent domain quantities happen to
+share the same value. Add a discriminating fixture before relying on the test;
+for example, make an episode revision differ from its enclosing State revision.
+For multi-layer behavior, verify both the pure component and the real adapter
+boundary when the latter supplies trust or persistence.
 
 ## 5. Require an Independent `$code-review`
 
@@ -99,17 +133,23 @@ context, interprets its findings, and controls remediation. If `$code-review` is
 available or cannot run because the base/diff is invalid, report that as an unmet
 final-gate condition rather than silently continuing.
 
+Do not bias the reviewer by saying that a suspected issue is already fixed or
+by narrowing it to a proposed implementation. Ask the reviewer to construct
+adversarial inputs at every trust boundary and to check the requirement-to-test
+matrix against the actual fixtures.
+
 ## 6. Remediate and Recheck
 
 For actionable review findings, determine the cause, make a scoped fix, rerun
 targeted tests plus any affected broader checks, and reassess affected acceptance
 criteria. If the fix is substantive, run `$code-review` again against the same PR
-base.
+base. A finding is not resolved until that independent recheck has inspected
+the remediation; self-assessment and a passing regression alone do not close it.
 
-Allow at most three complete review passes in total. Stop earlier when the review has
-no unresolved blocker or major correctness issue. If the limit is reached with a
-blocker or major issue remaining, stop and report it clearly; never present the PR as
-complete.
+Use at most three complete review passes in one implementation run. Stop earlier
+when the review has no unresolved blocker or major correctness issue. If the final
+allowed pass finds a blocker, do not claim completion after an unreviewed fix:
+report the PR as incomplete and require a later independently reviewed continuation.
 
 ## 7. Final Gate and Report
 
@@ -121,6 +161,11 @@ Declare the PR complete only when all core requirements and acceptance criteria 
 `VERIFIED`; relevant tests and required repository checks pass; `$code-review` ran;
 and no blocker, major correctness issue, known architecture violation, or obvious
 regression remains. Otherwise give a blocked/incomplete result and name what remains.
+
+Before declaring completion, explicitly confirm that every trust boundary has
+proof-backed verification, every numbered acceptance scenario has a matrix row
+or an explicit out-of-scope owner, and every substantive remediation received
+an independent review pass.
 
 Use this concise completion report:
 
