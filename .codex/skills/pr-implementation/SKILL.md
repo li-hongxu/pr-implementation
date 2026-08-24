@@ -43,6 +43,15 @@ another service needs either a validated witness produced by its adapter or an
 explicit integration test against that adapter. Do not represent metadata as a
 trusted witness without a verification path.
 
+When a decision depends on a bounded projection, window, summary, or other
+lossy view, trace every semantic discriminator it needs back to an authoritative
+trusted input. A display limit must not silently downgrade a semantic effect—for
+example, a privacy withdrawal must not become an ordinary removal merely because
+its tombstone is outside the retained window. Either carry the bounded,
+content-free decision metadata in the trusted event/delta and validate it, or
+quarantine/defer without advancing the checkpoint when the effect cannot be
+proved. Test each semantic reason both retained and omitted by the bounded view.
+
 ## 2. Discover the Repository
 
 Read the applicable instructions, relevant implementation and tests, existing
@@ -75,6 +84,13 @@ requirement-to-test matrix. Each scenario must name its fixture, expected
 effect/no-effect, and assertion. A broad test with many assertions is not
 evidence that every scenario was covered unless the matrix identifies the
 specific assertion for each one.
+
+For a cross-layer contract field, map its complete path before coding:
+authoritative schema and validator, domain model, producer, signed/identified
+payload, consumer, examples, and golden fixtures. A consumer fallback is not a
+fix when the producer cannot supply the semantic value. If one dimension can be
+truncated or omitted, make the test matrix cross that condition with every
+reason/status whose downstream effect differs.
 
 For comparisons and aggregation, include cross-dimensional fixtures instead of
 only happy-path values. Vary independent revisions separately, and use at least

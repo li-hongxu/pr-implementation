@@ -146,6 +146,24 @@ data.
 Required verification: cover symlink/alias attempts, wrong-store targets, required
 permissions, secure-delete settings, and supported platform path behavior.
 
+### RL-017 Bounded views must preserve decision provenance
+
+Do not derive a privacy, retention, terminal, or other semantic effect solely from
+a bounded projection window. If the retained view can omit the relevant record,
+the trusted event/delta must carry the minimal validated, content-free reason
+needed by the consumer; otherwise the consumer must not checkpoint an effect it
+cannot prove. A generic fallback reason is incorrect when downstream behavior or
+audit semantics distinguish the causes.
+
+When relevant: projection windows, pagination, summaries, tombstone retention,
+bounded publications, terminal withdrawals, privacy/retention removals, or any
+consumer that checkpoints a result derived from partial data.
+
+Required verification: trace the field through schema, model, producer, identity,
+consumer, and golden fixtures. Test each semantic reason with the record retained
+and omitted by the bounded view; assert the exact emitted reason and checkpoint
+behavior in both cases.
+
 ## Transactions and Delivery
 
 ### RL-012 Commit a logical change atomically
